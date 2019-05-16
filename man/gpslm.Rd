@@ -4,7 +4,7 @@
 \alias{gpslm}
 \title{Gaussian Process Spatial Linear Regression}
 \usage{
-gpslm(formula, data = parent.frame(), coords, m = NULL, kernel = "exponential", priors, starting, tuning, n.samples = 1000)
+gpslm(formula, data = parent.frame(), coords, m = NULL, col = NULL, kernel = "exponential", priors, starting, tuning, n.samples = 1000)
 }
 \arguments{
 \item{formula}{a formula, representing the linear model to fit.}
@@ -15,11 +15,13 @@ gpslm(formula, data = parent.frame(), coords, m = NULL, kernel = "exponential", 
 
 \item{m}{an integer, specifying the number of neighbors to use for the nearest-neighbor kernel. If NULL, a dense kernel is used.}
 
+\item{col}{an integer, specifying the column to order by if using a nearest-neighbor kernel. If \code{m = NULL}, this argument is ignored.}
+
 \item{kernel}{a string, indicating which kernel should be used for the spatial Gaussian process. Currently, possible the only possible option is "exponential".}
 
-\item{priors}{a list, containing the priors to use for the model. Should contain elements "phi.unif", a vector of length 2; "sigma.sq.ig", a vector of length 2; "tau.sq.ig", a vector of length 2; "beta.norm", a vector of length 2.}
+\item{priors}{a list, containing the priors to use for the model. Should contain elements "phi", a vector of length 2; "sigma.sq", a vector of length 2; "tau.sq", a vector of length 2; "beta", a vector of length 2.}
 
-\item{starting}{a list, containing starting values to use for the MCMC. Should contain elements "phi", "sigma.sq"; can also contain elements "beta" and "tau.sq" if desired, otherwise initial estimates are calculated.}
+\item{starting}{a list, containing starting values to use for the MCMC. Should contain elements "phi", "sigma.sq", and "tau.sq"; can also contain element "beta" if desired, otherwise an initial estimate is calculated.}
 
 \item{tuning}{a list, containing the tuning parameters to use for the MCMC. Should contain elements "phi" and "sigma.sq"; full conditionals are used for all other parameters.}
 
@@ -39,5 +41,5 @@ Returns a list containing the following elements:
 Performs markov-chain monte carlo on the posterior of a linear regression model containing an unobserved spatial random effect that comes from a Gaussian Process.
 }
 \details{
-This function fits the  model \eqn{y = X\beta + Zw + \epsilon}, where \eqn{w ~ GP(0, \sigma^2 K)}, \eqn{\epsilon ~ N(0, \tau^2)}. For the exponential kernel, \eqn{K = exp(-\phi D)}, where \eqn{D} is the Euclidian distance matrix between coordinates. A flat prior is applied to \eqn{\phi}, inverse-gamma priors are applied to both \eqn{\sigma^2} and \eqn{\tau^2}, and a normal prior is applied to \eqn{\beta}.
+This function fits the  model \eqn{y = X\beta + w + \epsilon}, where \eqn{w ~ GP(0, \sigma^2 K)}, \eqn{\epsilon ~ N(0, \tau^2)}. For the exponential kernel, \eqn{K = exp(-\phi D)}, where \eqn{D} is the Euclidian distance matrix between coordinates. A flat prior is applied to \eqn{\phi}, inverse-gamma priors are applied to both \eqn{\sigma^2} and \eqn{\tau^2}, and a normal prior is applied to \eqn{\beta}.
 }

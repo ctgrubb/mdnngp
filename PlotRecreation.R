@@ -1,14 +1,13 @@
-library(maximin)
 library(raster)
 library(spBayes)
 library(ggplot2)
 library(scales)
+library(mdnngp)
 
-gridl <- 20 # Size of synthetic data in each dimension, i.e. total size gridl^d
+N <- 2500 # Size of synthetic data in each dimension, i.e. total size gridl^d
 train.prop <- 0.8 # Proportion for training
 
-x <- seq(0, 1, length.out = gridl)
-total.set <- as.matrix(expand.grid(x, x))
+total.set <- matrix(runif(N * 2), ncol = 2)
 
 train.size <- round(train.prop * dim(total.set)[1])
 test.size <- round((1 - train.prop) * dim(total.set)[1])
@@ -63,13 +62,36 @@ knot_fit <- spLM(y.train ~ X.train - 1, coords = train.coords, knots = c(8, 8, -
                                "phi.Unif" = c(3, 30), 
                                "sigma.sq.IG" = c(2, 2), 
                                "tau.sq.IG" = c(2, 0.1)),
-                 cov.model = "exponential", n.samples = 5000, verbose = FALSE, n.report = 500)
-knot_rs <- spRecover(knot_fit, start = 1000, verbose = FALSE)
+                 cov.model = "exponential", n.samples = 1000, verbose = FALSE, n.report = 50)
+knot_rs <- spRecover(knot_fit, start = 100, verbose = FALSE)
 
 interp.plot(res = 200, X = train.coords, Z = rowMeans(knot_rs$p.w.recover.samples), 
             Zlim = c(-3, 3), filename = "~/git-repos/classlib/rsm/hw/finalproject/p3.png", 
             save = TRUE, width = 720, height = 720)
 
+gpslm_fit <- gpslm(formula = y.train ~ X.train - 1, coords = train.coords, m = 10, col = 2, n.samples = 500,
+                   priors = list("phi" = c(3, 30), 
+                                 "sigma.sq" = c(2, 2),
+                                 "tau.sq" = c(2, 0.1), 
+                                 "beta" = c(0, 1000)),
+                   starting = list("phi" = 12, "sigma.sq" = 1, "tau.sq" = 0.1),
+                   tuning = list("phi" = 0.1, "sigma.sq" = 0.1))
+
+interp.plot(res = 200, X = train.coords, Z = colMeans(gpslm_fit$w.samples), 
+            Zlim = c(-3, 3), filename = "~/git-repos/classlib/rsm/hw/finalproject/p4.png", 
+            save = TRUE, width = 720, height = 720)
+
+gpslm_fit <- gpslm(formula = y.train ~ X.train - 1, coords = train.coords, m = 20, col = 2, n.samples = 500,
+                   priors = list("phi" = c(3, 30), 
+                                 "sigma.sq" = c(2, 2),
+                                 "tau.sq" = c(2, 0.1), 
+                                 "beta" = c(0, 1000)),
+                   starting = list("phi" = 12, "sigma.sq" = 1, "tau.sq" = 0.1),
+                   tuning = list("phi" = 0.1, "sigma.sq" = 0.1))
+
+interp.plot(res = 200, X = train.coords, Z = colMeans(gpslm_fit$w.samples), 
+            Zlim = c(-3, 3), filename = "~/git-repos/classlib/rsm/hw/finalproject/p5.png", 
+            save = TRUE, width = 720, height = 720)
 
 
 

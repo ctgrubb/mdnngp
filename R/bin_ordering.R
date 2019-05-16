@@ -12,7 +12,6 @@
 #'   \item{bins}{A matrix containing the bin assignments for each observation}
 #'   \item{score}{Pooled variance of orderings across bins; used to judge which ordering is best when conducted multiple times}
 #' @export
-#' @importFrom plgp distance
 
 bin_ordering <- function(X, bins, iters = 1000) {
   if(!(length(bins) == 1 || length(bins) == dim(X)[2])) {
@@ -52,7 +51,7 @@ bin_ordering <- function(X, bins, iters = 1000) {
   }
   pv <- sum(meanmatrix[, 1] * meanmatrix[, 2]) / sum(meanmatrix[, 2])
   out <- list(X = as.matrix(Xdf[, 1:dim(X)[2]]), 
-              order = as.numeric(Xdf[, dim(X)[2] + 1]), 
+              order = as.numeric(order(Xdf[, dim(X)[2] + 1])), 
               bins = as.matrix(Xdf[, (dim(X)[2] + 2):(2 * dim(X)[2] + 1)]),
               score = pv)
   class(out) <- "Xord"
